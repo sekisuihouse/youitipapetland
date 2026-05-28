@@ -296,7 +296,7 @@
     function splitPageMarkup(entry, side) {
       const position = side === 'left' ? 'left center' : 'right center';
       const label = side === 'left' ? 'left page' : 'right page';
-      return '<div class="page split-page" role="img" aria-label="' + escapeHtml(entry.name) + ' ' + label + '" style="background-image: url('' + imageSrc(entry) + ''); background-position: ' + position + ';"></div>';
+      return '<div class="page split-page" role="img" aria-label="' + escapeHtml(entry.name) + ' ' + label + '" style="background-image: url(&quot;' + imageSrc(entry) + '&quot;); background-position: ' + position + ';"></div>';
     }
 
     function imageSrc(entry) {
