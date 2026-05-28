@@ -163,6 +163,13 @@
       font-weight: 600;
     }
 
+    .volume-card .load-state {
+      margin-top: 12px;
+      color: #24704f;
+      font-size: clamp(12px, 1.6vw, 16px);
+      font-weight: 760;
+    }
+
     .nav {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -228,6 +235,7 @@
 
     let entries = [];
     let entryIndex = 0;
+    let activePreload = null;
 
     VOLUMES.forEach((volume, index) => {
       const option = document.createElement('option');
@@ -271,19 +279,29 @@
 
     function render() {
       const entry = entries[entryIndex];
+      const isLoading = entry.volume.loading === true;
       title.textContent = entry.volume.title;
       document.title = entry.volume.title + ' - 全話リーダー';
       volumeSelect.value = entry.volume.id;
       spread.className = 'spread ' + (entry.type === 'cover' || entry.type === 'title' ? 'cover' : '');
       spread.innerHTML = entryMarkup(entry);
       counter.textContent = String(entryIndex + 1) + ' / ' + entries.length;
-      forwardButton.disabled = entryIndex >= entries.length - 1;
+      forwardButton.disabled = isLoading || entryIndex >= entries.length - 1;
       backButton.disabled = entryIndex <= 0;
+      openButton.disabled = isLoading;
+      if (entry.type === 'title') preloadVolume(entry.volume);
     }
 
     function entryMarkup(entry) {
       if (entry.type === 'title') {
-        return '<div class="page volume-card">' + escapeHtml(entry.volume.title) + '<span>' + entry.volume.images.length + '画像</span></div>';
+        const loaded = entry.volume.loadedCount || 0;
+        const total = entry.volume.images.length;
+        const state = entry.volume.loaded
+          ? '読み込み完了'
+          : entry.volume.loading
+            ? '画像読み込み中 ' + loaded + ' / ' + total
+            : '画像を読み込みます';
+        return '<div class="page volume-card">' + escapeHtml(entry.volume.title) + '<span>' + total + '画像</span><div class="load-state">' + state + '</div></div>';
       }
       if (entry.type === 'cover') return pageMarkup(entry);
       return splitPageMarkup(entry, 'left') + splitPageMarkup(entry, 'right');
@@ -305,8 +323,37 @@
 
     function goTo(nextIndex) {
       if (nextIndex < 0 || nextIndex >= entries.length || nextIndex === entryIndex) return;
+      if (entries[entryIndex].volume.loading) return;
       entryIndex = nextIndex;
       render();
+    }
+
+    function preloadVolume(volume) {
+      if (volume.loaded || volume.loading) return;
+      volume.loading = true;
+      volume.loadedCount = 0;
+      const token = {};
+      activePreload = token;
+      render();
+      Promise.all(volume.images.map((name) => preloadImage(volume, name, token))).then(() => {
+        volume.loaded = true;
+        volume.loading = false;
+        if (activePreload === token) render();
+      });
+    }
+
+    function preloadImage(volume, name, token) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        const finish = () => {
+          volume.loadedCount = Math.min(volume.images.length, (volume.loadedCount || 0) + 1);
+          if (activePreload === token) render();
+          resolve();
+        };
+        img.addEventListener('load', finish, { once: true });
+        img.addEventListener('error', finish, { once: true });
+        img.src = '../' + volume.dir + '/' + encodeURI(name);
+      });
     }
 
     function escapeHtml(value) {
