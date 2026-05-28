@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>陽一パペットランド</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111;
+      --panel: #202020;
+      --text: #f5f5f5;
+      --muted: #b8b8b8;
+      --line: #444;
+      --accent: #44d28f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.08), transparent 34rem), var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(100%, 760px);
+      display: grid;
+      gap: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 6vw, 56px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    a {
+      min-height: 56px;
+      display: grid;
+      align-items: center;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 760;
+    }
+
+    a:hover {
+      border-color: var(--accent);
+    }
+
+    .primary {
+      background: linear-gradient(180deg, var(--accent), #159061);
+      color: #061710;
+      border-color: transparent;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>陽一パペットランド</h1>
+    <p>漫画リーダーを選んで開けます。全話リーダーでは、第一話から第三話まで続けて読めます。</p>
+    <nav class="links" aria-label="漫画リーダー">
+      <a class="primary" href="all/">全話リーダー</a>
+      <a href="mix/">第一話</a>
+      <a href="mix3/">第二話</a>
+      <a href="mix4/">第三話</a>
+    </nav>
+  </main>
+</body>
+</html>

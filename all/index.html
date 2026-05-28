@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>陽一パペットランド 全話リーダー</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111;
+      --panel: #202020;
+      --text: #f5f5f5;
+      --muted: #b8b8b8;
+      --line: #444;
+      --accent: #44d28f;
+      --shadow: rgba(0, 0, 0, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.08), transparent 34rem), var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, select { font: inherit; }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+      padding: 14px clamp(12px, 2.4vw, 28px) 18px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-size: clamp(20px, 3vw, 34px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .counter {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .volume-select, .nav-button, .open-button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      min-height: 44px;
+      padding: 0 14px;
+      white-space: nowrap;
+    }
+
+    .volume-select:hover, .nav-button:hover:not(:disabled), .open-button:hover { border-color: var(--accent); }
+
+    .nav-button:disabled { opacity: 0.42; cursor: not-allowed; }
+
+    .stage {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.1), transparent 52%), #080808;
+      box-shadow: 0 22px 68px var(--shadow);
+      perspective: 1800px;
+    }
+
+    .book {
+      position: relative;
+      width: min(94vw, calc(78vh * 1.42), 1180px);
+      height: min(78vh, calc(94vw / 1.42), 830px);
+      transform-style: preserve-3d;
+    }
+
+    .spread {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      border-radius: 4px;
+      background: #fbfbfb;
+      box-shadow: 0 2px 0 rgba(255, 255, 255, 0.56) inset, 0 -22px 28px rgba(0, 0, 0, 0.12) inset, 0 22px 48px var(--shadow);
+      backface-visibility: hidden;
+    }
+
+    .spread.cover { left: 25%; right: 25%; grid-template-columns: 1fr; }
+
+    .spread::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(0, 0, 0, 0.17), transparent 11%, transparent 89%, rgba(0, 0, 0, 0.11)), linear-gradient(90deg, transparent calc(50% - 1px), rgba(0, 0, 0, 0.28) 50%, transparent calc(50% + 1px));
+      mix-blend-mode: multiply;
+    }
+
+    .spread.cover::after { background: linear-gradient(90deg, rgba(0, 0, 0, 0.16), transparent 16%, transparent 88%, rgba(0, 0, 0, 0.1)); }
+
+    .page {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .page:first-child { box-shadow: -20px 0 28px rgba(0, 0, 0, 0.08) inset; }
+    .page:last-child { box-shadow: 20px 0 28px rgba(0, 0, 0, 0.08) inset; }
+    .page.blank { background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), transparent 38%), #fafafa; }
+    .page img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .split-page { background-repeat: no-repeat; background-size: 200% 100%; }
+
+    .volume-card {
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      background: linear-gradient(135deg, #fdfdfd, #e7e7e7);
+      color: #111;
+      text-align: center;
+      font-weight: 800;
+      font-size: clamp(22px, 4vw, 42px);
+      line-height: 1.25;
+    }
+
+    .volume-card span {
+      display: block;
+      margin-top: 16px;
+      color: #555;
+      font-size: clamp(13px, 1.8vw, 18px);
+      font-weight: 600;
+    }
+
+    .nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .nav-button {
+      min-height: 54px;
+      font-weight: 760;
+      font-size: clamp(16px, 2vw, 20px);
+    }
+
+    .nav-button.forward {
+      background: linear-gradient(180deg, var(--accent), #159061);
+      color: #061710;
+      border-color: transparent;
+    }
+
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+      .app { min-height: 100vh; height: auto; }
+      .topbar { grid-template-columns: 1fr; }
+      .actions { justify-content: space-between; }
+      .volume-select { flex: 1 1 180px; min-width: 0; }
+      .stage { min-height: 64vh; }
+      .book { width: min(94vw, calc(64vh * 1.42)); height: min(64vh, calc(94vw / 1.42)); }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1 id="title">陽一パペットランド 全話リーダー</h1>
+      <div class="actions">
+        <select id="volumeSelect" class="volume-select" aria-label="話を選択"></select>
+        <div id="counter" class="counter"></div>
+        <button id="openButton" class="open-button" type="button">この話を単独で開く</button>
+      </div>
+    </header>
+
+    <section class="stage" aria-live="polite">
+      <div class="book">
+        <div id="spread" class="spread"></div>
+      </div>
+    </section>
+
+    <nav class="nav" aria-label="ページ操作">
+      <button id="forwardButton" class="nav-button forward" type="button">左に進む</button>
+      <button id="backButton" class="nav-button" type="button">右に戻る</button>
+    </nav>
+  </main>
+
+  <script id="volume-data" type="application/json">[{"id":"mix","dir":"mix","title":"陽一パペットランド 第一話","images":["mangaimage (28).png","mangaimage (27).png","mangaimage (35).png","mangaimage (26).png","mangaimage (30).png","mangaimage (34).png","mangaimage (29).png","mangaimage (25).png","mangaimage (32).png","mangaimage (31).png","mangaimage (33).png","mangaimage (23).png","mangaimage (22).png","mangaimage (21).png","mangaimage (20).png","mangaimage (15).png","mangaimage (16).png","mangaimage (4).png","mangaimage (17).png","mangaimage (18).png","mangaimage (19).png","mangaimage (13).png","mangaimage (12).png","mangaimage (42).png","mangaimage (37).png","mangaimage (40).png","mangaimage (38).png","mangaimage (36).png","mangaimage (41).png","mangaimage (39).png","mangaimage (7).png","mangaimage (10).png","mangaimage (9).png","mangaimage (8).png","mangaimage (6).png","mangaimage (5).png"],"fullPageCount":1},{"id":"mix3","dir":"mix3","title":"陽一パペットランド 第二話","images":["mangaimage (16).png","mangaimage (17).png","mangaimage (18).png","mangaimage (19).png","mangaimage (20).png","mangaimage (21).png","mangaimage (22).png","mangaimage (23).png","mangaimage (24).png","mangaimage (25).png","mangaimage (26).png","mangaimage (27).png","mangaimage (28).png","mangaimage (29).png","mangaimage (30).png","mangaimage (31).png","mangaimage (32).png","mangaimage (33).png","mangaimage (34).png","mangaimage (35).png","mangaimage (36).png","mangaimage (37).png","mangaimage (38).png","mangaimage (39).png","mangaimage (40).png","mangaimage (41).png","mangaimage (42).png","mangaimage (43).png","mangaimage (44).png","mangaimage (45).png","mangaimage (46).png","mangaimage (47).png","mangaimage (48).png","mangaimage (49).png","mangaimage (50).png","mangaimage (51).png"],"fullPageCount":1},{"id":"mix4","dir":"mix4","title":"陽一パペットランド 第三話","images":["陽一3(0).png","陽一3(0.5).png","陽一3 (1).png","陽一3 (2).png","陽一3 (3).png","陽一3 (4).png","陽一3 (5).png","陽一3 (6).png","陽一3 (7).png","陽一3 (8).png","陽一3 (9).png","陽一3 (10).png","陽一3 (11).png","陽一3 (13).png","陽一3 (14).png","陽一3 (15).png","陽一3 (16).png","陽一3 (17).png","陽一3 (18).png","陽一3 (19).png","陽一3(19.5).png","陽一3 (20).png","陽一3 (21).png","陽一3 (22).png","陽一3 (23).png","陽一3 (24).png","陽一3 (25).png","陽一3 (26).png","陽一3 (27).png","陽一3 (28).png","陽一3 (29).png","陽一3 (30).png","陽一3 (31).png","陽一3 (32).png","陽一3 (33).png","陽一3 (34).png","陽一3 (35).png","陽一3 (36).png"],"fullPageCount":2}]</script>
+  <script>
+    const VOLUMES = JSON.parse(document.getElementById('volume-data').textContent);
+    const title = document.querySelector('#title');
+    const counter = document.querySelector('#counter');
+    const spread = document.querySelector('#spread');
+    const forwardButton = document.querySelector('#forwardButton');
+    const backButton = document.querySelector('#backButton');
+    const openButton = document.querySelector('#openButton');
+    const volumeSelect = document.querySelector('#volumeSelect');
+
+    let entries = [];
+    let entryIndex = 0;
+
+    VOLUMES.forEach((volume, index) => {
+      const option = document.createElement('option');
+      option.value = volume.id;
+      option.textContent = volume.title;
+      volumeSelect.append(option);
+    });
+
+    buildEntries();
+    render();
+
+    forwardButton.addEventListener('click', () => goTo(entryIndex + 1));
+    backButton.addEventListener('click', () => goTo(entryIndex - 1));
+    openButton.addEventListener('click', () => {
+      const volume = entries[entryIndex].volume;
+      window.location.href = '../' + volume.dir + '/index.html';
+    });
+    volumeSelect.addEventListener('change', () => {
+      const nextIndex = entries.findIndex((entry) => entry.type === 'title' && entry.volume.id === volumeSelect.value);
+      if (nextIndex >= 0) goTo(nextIndex);
+    });
+    spread.addEventListener('click', (event) => {
+      const rect = spread.getBoundingClientRect();
+      const leftSide = event.clientX - rect.left < rect.width / 2;
+      goTo(entryIndex + (leftSide ? 1 : -1));
+    });
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') goTo(entryIndex + 1);
+      if (event.key === 'ArrowRight') goTo(entryIndex - 1);
+    });
+
+    function buildEntries() {
+      entries = [];
+      VOLUMES.forEach((volume) => {
+        entries.push({ type: 'title', volume });
+        volume.images.forEach((name, imageIndex) => {
+          entries.push({ type: imageIndex < (volume.fullPageCount || 1) ? 'cover' : 'spread', volume, name, imageIndex });
+        });
+      });
+    }
+
+    function render() {
+      const entry = entries[entryIndex];
+      title.textContent = entry.volume.title;
+      document.title = entry.volume.title + ' - 全話リーダー';
+      volumeSelect.value = entry.volume.id;
+      spread.className = 'spread ' + (entry.type === 'cover' || entry.type === 'title' ? 'cover' : '');
+      spread.innerHTML = entryMarkup(entry);
+      counter.textContent = String(entryIndex + 1) + ' / ' + entries.length;
+      forwardButton.disabled = entryIndex >= entries.length - 1;
+      backButton.disabled = entryIndex <= 0;
+    }
+
+    function entryMarkup(entry) {
+      if (entry.type === 'title') {
+        return '<div class="page volume-card">' + escapeHtml(entry.volume.title) + '<span>' + entry.volume.images.length + '画像</span></div>';
+      }
+      if (entry.type === 'cover') return pageMarkup(entry);
+      return splitPageMarkup(entry, 'left') + splitPageMarkup(entry, 'right');
+    }
+
+    function pageMarkup(entry) {
+      return '<div class="page"><img src="' + imageSrc(entry) + '" alt="' + escapeHtml(entry.name) + '"></div>';
+    }
+
+    function splitPageMarkup(entry, side) {
+      const position = side === 'left' ? 'left center' : 'right center';
+      const label = side === 'left' ? 'left page' : 'right page';
+      return '<div class="page split-page" role="img" aria-label="' + escapeHtml(entry.name) + ' ' + label + '" style="background-image: url('' + imageSrc(entry) + ''); background-position: ' + position + ';"></div>';
+    }
+
+    function imageSrc(entry) {
+      return '../' + entry.volume.dir + '/' + encodeURI(entry.name);
+    }
+
+    function goTo(nextIndex) {
+      if (nextIndex < 0 || nextIndex >= entries.length || nextIndex === entryIndex) return;
+      entryIndex = nextIndex;
+      render();
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+    }
+  </script>
+</body>
+</html>
