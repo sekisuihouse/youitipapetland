@@ -236,6 +236,7 @@
     let entries = [];
     let entryIndex = 0;
     let activePreload = null;
+    let backgroundPreloadQueue = Promise.resolve();
 
     VOLUMES.forEach((volume, index) => {
       const option = document.createElement('option');
@@ -279,6 +280,9 @@
 
     function render() {
       const entry = entries[entryIndex];
+      if (entry.type === 'title' && entry.volume.loading && !entry.volume.loaded) {
+        entry.volume.blocking = true;
+      }
       const isLoading = entry.volume.loading === true;
       title.textContent = entry.volume.title;
       document.title = entry.volume.title + ' - 全話リーダー';
@@ -289,7 +293,8 @@
       forwardButton.disabled = isLoading || entryIndex >= entries.length - 1;
       backButton.disabled = entryIndex <= 0;
       openButton.disabled = isLoading;
-      if (entry.type === 'title') preloadVolume(entry.volume);
+      if (entry.type === 'title') preloadVolume(entry.volume, { block: true });
+      if (entry.type !== 'title') preloadNextVolumes(entry.volume);
     }
 
     function entryMarkup(entry) {
@@ -299,7 +304,7 @@
         const state = entry.volume.loaded
           ? '読み込み完了'
           : entry.volume.loading
-            ? '画像読み込み中 ' + loaded + ' / ' + total
+            ? (entry.volume.blocking ? '画像読み込み中 ' : '先読み中 ') + loaded + ' / ' + total
             : '画像を読み込みます';
         return '<div class="page volume-card">' + escapeHtml(entry.volume.title) + '<span>' + total + '画像</span><div class="load-state">' + state + '</div></div>';
       }
@@ -328,17 +333,37 @@
       render();
     }
 
-    function preloadVolume(volume) {
-      if (volume.loaded || volume.loading) return;
+    function preloadVolume(volume, options = {}) {
+      if (volume.loaded) return Promise.resolve();
+      if (volume.preloadPromise) {
+        if (options.block) volume.blocking = true;
+        return volume.preloadPromise;
+      }
+      if (volume.loading) return Promise.resolve();
+
       volume.loading = true;
+      volume.blocking = options.block === true;
       volume.loadedCount = 0;
       const token = {};
-      activePreload = token;
-      render();
-      Promise.all(volume.images.map((name) => preloadImage(volume, name, token))).then(() => {
+      if (volume.blocking) activePreload = token;
+
+      volume.preloadPromise = Promise.all(volume.images.map((name) => preloadImage(volume, name, token))).then(() => {
         volume.loaded = true;
         volume.loading = false;
-        if (activePreload === token) render();
+        volume.blocking = false;
+        if (activePreload === token || isCurrentVolume(volume)) render();
+      });
+
+      render();
+      return volume.preloadPromise;
+    }
+
+    function preloadNextVolumes(currentVolume) {
+      const currentIndex = VOLUMES.indexOf(currentVolume);
+      VOLUMES.slice(currentIndex + 1).forEach((volume) => {
+        if (volume.loaded || volume.loading || volume.queued) return;
+        volume.queued = true;
+        backgroundPreloadQueue = backgroundPreloadQueue.then(() => preloadVolume(volume, { block: false }));
       });
     }
 
@@ -347,13 +372,17 @@
         const img = new Image();
         const finish = () => {
           volume.loadedCount = Math.min(volume.images.length, (volume.loadedCount || 0) + 1);
-          if (activePreload === token) render();
+          if (activePreload === token || isCurrentVolume(volume)) render();
           resolve();
         };
         img.addEventListener('load', finish, { once: true });
         img.addEventListener('error', finish, { once: true });
         img.src = '../' + volume.dir + '/' + encodeURI(name);
       });
+    }
+
+    function isCurrentVolume(volume) {
+      return entries[entryIndex] && entries[entryIndex].volume === volume;
     }
 
     function escapeHtml(value) {
