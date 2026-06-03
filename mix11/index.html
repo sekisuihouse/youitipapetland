@@ -117,6 +117,11 @@
       transform-style: preserve-3d;
     }
 
+    .book.ending-book {
+      width: min(76vw, calc(78vh * 0.67), 560px);
+      height: min(78vh, calc(76vw / 0.67), 840px);
+    }
+
     .spread {
       position: absolute;
       inset: 0;
@@ -136,6 +141,13 @@
       left: 25%;
       right: 25%;
       grid-template-columns: 1fr;
+    }
+
+    .spread.ending {
+      left: 0;
+      right: 0;
+      grid-template-columns: 1fr;
+      background: #130f0b;
     }
 
     .spread::after {
@@ -187,6 +199,70 @@
     .split-page {
       background-repeat: no-repeat;
       background-size: 200% 100%;
+    }
+
+    .ending-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #120d0a;
+      color: #1a120d;
+    }
+
+    .ending-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ending-copy {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      top: 33%;
+      min-height: 34%;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: clamp(10px, 2vh, 18px);
+      padding: clamp(12px, 2.4vw, 28px);
+      text-align: center;
+    }
+
+    .ending-copy h2 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 62px);
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .ending-copy p {
+      margin: 0;
+      color: #4c4034;
+      font-size: clamp(13px, 1.6vw, 18px);
+      line-height: 1.7;
+      font-weight: 700;
+    }
+
+    .ending-link {
+      max-width: 100%;
+      min-height: 44px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(26, 18, 13, 0.25);
+      border-radius: 8px;
+      padding: 0 16px;
+      background: #2d7a58;
+      color: #f7fff9;
+      text-decoration: none;
+      font-size: clamp(13px, 1.4vw, 16px);
+      font-weight: 850;
+      overflow-wrap: anywhere;
+      box-shadow: 0 12px 24px rgba(26, 18, 13, 0.18);
     }
 
     .nav {
@@ -250,6 +326,17 @@
       .book {
         width: min(94vw, calc(64vh * 1.42));
         height: min(64vh, calc(94vw / 1.42));
+      }
+
+      .book.ending-book {
+        width: min(88vw, calc(72vh * 0.67));
+        height: min(72vh, calc(88vw / 0.67));
+      }
+
+      .ending-copy {
+        left: 7%;
+        right: 7%;
+        top: 32%;
       }
     }
   </style>
@@ -323,10 +410,13 @@
     const title = document.querySelector("#title");
     const counter = document.querySelector("#counter");
     const spread = document.querySelector("#spread");
+    const book = document.querySelector(".book");
     const forwardButton = document.querySelector("#forwardButton");
     const backButton = document.querySelector("#backButton");
     const pdfButton = document.querySelector("#pdfButton");
     const status = document.querySelector("#status");
+    const SURVEY_URL = "https://sekisuihouse.github.io/youitipapetland/survey/";
+    const ENDING_IMAGE = "../assets/ending-thanks.jpg";
 
     let pages = [];
     let spreadIndex = 0;
@@ -340,6 +430,7 @@
     backButton.addEventListener("click", () => goTo(spreadIndex - 1, "back"));
     pdfButton.addEventListener("click", exportPdf);
     spread.addEventListener("click", (event) => {
+      if (event.target.closest("a")) return;
       const rect = spread.getBoundingClientRect();
       const leftSide = event.clientX - rect.left < rect.width / 2;
       if (leftSide) {
@@ -379,7 +470,8 @@
     function render() {
       const spreadCount = getSpreadCount();
       spreadIndex = Math.min(spreadIndex, spreadCount - 1);
-      spread.className = `spread ${isSinglePageIndex(spreadIndex) ? "cover" : ""}`;
+      book.className = isEndingIndex(spreadIndex) ? "book ending-book" : "book";
+      spread.className = `spread ${isEndingIndex(spreadIndex) ? "ending" : isSinglePageIndex(spreadIndex) ? "cover" : ""}`;
       spread.innerHTML = spreadMarkup(spreadIndex);
       counter.textContent = pages.length ? spreadLabel(spreadIndex) : "0 / 0";
       forwardButton.disabled = !pages.length || spreadIndex >= spreadCount - 1;
@@ -388,15 +480,21 @@
     }
 
     function getSpreadCount() {
-      return Math.max(1, pages.length);
+      return Math.max(1, pages.length + 1);
+    }
+
+    function isEndingIndex(index) {
+      return pages.length > 0 && index === pages.length;
     }
 
     function isSinglePageIndex(index) {
+      if (isEndingIndex(index)) return true;
       const page = pages[index];
       return !page || page.width <= page.height;
     }
 
     function spreadLabel(index) {
+      if (isEndingIndex(index)) return "END";
       const total = pages.reduce((sum, page, pageIndex) => sum + (isSinglePageIndex(pageIndex) ? 1 : 2), 0);
       const start = pages.slice(0, index).reduce((sum, page, pageIndex) => sum + (isSinglePageIndex(pageIndex) ? 1 : 2), 1);
       if (isSinglePageIndex(index)) return `${start} / ${total}`;
@@ -404,8 +502,13 @@
     }
 
     function spreadMarkup(index) {
+      if (isEndingIndex(index)) return endingMarkup();
       if (isSinglePageIndex(index)) return pageMarkup(pages[index]);
       return splitPageMarkup(pages[index], "left") + splitPageMarkup(pages[index], "right");
+    }
+
+    function endingMarkup() {
+      return `<div class="ending-card"><img src="${ENDING_IMAGE}" alt="読んでくれてありがとう！！"><div class="ending-copy"><h2>読んでくれてありがとう！！</h2><p>最後まで読んだ感想を、アンケートで教えてください。</p><a class="ending-link" href="../survey/">アンケートへ<br>${SURVEY_URL}</a></div></div>`;
     }
 
     function pageMarkup(page) {
