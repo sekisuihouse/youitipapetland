@@ -229,7 +229,14 @@
       font-weight: 700;
     }
 
-    .ending-link {
+    .ending-actions {
+      width: min(100%, 430px);
+      display: grid;
+      gap: 8px;
+    }
+
+    .ending-link,
+    .ending-back {
       max-width: 100%;
       min-height: 44px;
       display: inline-grid;
@@ -244,6 +251,12 @@
       font-weight: 850;
       overflow-wrap: anywhere;
       box-shadow: 0 12px 24px rgba(26, 18, 13, 0.18);
+    }
+
+    .ending-back {
+      background: rgba(255, 253, 248, 0.88);
+      color: #1a120d;
+      cursor: pointer;
     }
 
     .nav {
@@ -345,6 +358,10 @@
     });
     spread.addEventListener('click', (event) => {
       if (event.target.closest('a')) return;
+      if (event.target.closest('.ending-back')) {
+        goTo(entryIndex - 1);
+        return;
+      }
       const rect = spread.getBoundingClientRect();
       const leftSide = event.clientX - rect.left < rect.width / 2;
       goTo(entryIndex + (leftSide ? 1 : -1));
@@ -401,7 +418,7 @@
 
     function entryMarkup(entry) {
       if (entry.type === 'ending') {
-        return '<div class="ending-card"><img src="' + ENDING_IMAGE + '" alt="読んでくれてありがとう！！"><div class="ending-copy"><h2>読んでくれてありがとう！！</h2><p>最後まで読んだ感想を、アンケートで教えてください。</p><a class="ending-link" href="../survey/">アンケートへ<br>' + SURVEY_URL + '</a></div></div>';
+        return '<div class="ending-card"><img src="' + ENDING_IMAGE + '" alt="読んでくれてありがとう！！"><div class="ending-copy"><h2>読んでくれてありがとう！！</h2><p>最後まで読んだ感想を、アンケートで教えてください。</p><div class="ending-actions"><a class="ending-link" href="../survey/">アンケートへ<br>' + SURVEY_URL + '</a><button class="ending-back" type="button">漫画に戻る</button></div></div></div>';
       }
       if (entry.type === 'title') {
         const loaded = entry.volume.loadedCount || 0;
@@ -433,7 +450,7 @@
 
     function goTo(nextIndex) {
       if (nextIndex < 0 || nextIndex >= entries.length || nextIndex === entryIndex) return;
-      if (entries[entryIndex].volume.loading) return;
+      if (entries[entryIndex].volume?.loading) return;
       entryIndex = nextIndex;
       render();
     }
