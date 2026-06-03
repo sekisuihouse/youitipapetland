@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>陽一パペットランド アンケート</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f4ee;
+      --paper: #fffdf8;
+      --ink: #17130f;
+      --muted: #70685f;
+      --line: #ded6ca;
+      --accent: #2d7a58;
+      --accent-ink: #f7fff9;
+      --shadow: rgba(43, 32, 22, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0)),
+        var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(100% - 32px, 1120px);
+      margin: 0 auto;
+      padding: clamp(28px, 6vw, 72px) 0;
+      display: grid;
+      gap: clamp(28px, 5vw, 56px);
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(180px, 300px);
+      gap: clamp(24px, 5vw, 64px);
+      align-items: end;
+    }
+
+    .copy {
+      display: grid;
+      gap: 20px;
+      max-width: 680px;
+    }
+
+    .label {
+      margin: 0;
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 12px;
+      background: rgba(255, 253, 248, 0.74);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 7vw, 72px);
+      line-height: 1.02;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 19px);
+      line-height: 1.9;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 18px;
+      background: var(--paper);
+      text-decoration: none;
+      font-weight: 760;
+    }
+
+    .button.primary {
+      border-color: transparent;
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .cover {
+      margin: 0;
+      justify-self: end;
+      width: min(100%, 280px);
+    }
+
+    .cover img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 20px 54px var(--shadow);
+    }
+
+    .form-shell {
+      display: grid;
+      gap: 16px;
+    }
+
+    .form-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    .form-head h2 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .form-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      text-align: right;
+    }
+
+    .form-frame {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 18px 54px var(--shadow);
+    }
+
+    .form-frame iframe {
+      display: block;
+      width: 100%;
+      min-height: 1829px;
+      border: 0;
+      background: var(--paper);
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 24px, 1120px);
+      }
+
+      .intro {
+        grid-template-columns: 1fr;
+      }
+
+      .cover {
+        justify-self: start;
+        width: min(64vw, 220px);
+      }
+
+      .form-head {
+        display: grid;
+      }
+
+      .form-head p {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro" aria-labelledby="pageTitle">
+      <div class="copy">
+        <p class="label">陽一パペットランドを見た人へ</p>
+        <h1 id="pageTitle">読後アンケート</h1>
+        <p class="lead">陽一パペットランドを読んだあとに残った感覚、好きだった場面、気になった言葉を教えてください。短くても、そのままでも大丈夫です。</p>
+        <div class="actions">
+          <a class="button primary" href="#form">回答する</a>
+          <a class="button" href="../all/">もう一度読む</a>
+        </div>
+      </div>
+      <figure class="cover" aria-label="陽一パペットランドの画像">
+        <img src="assets/yoichi-cover.jpg" alt="陽一パペットランド">
+      </figure>
+    </section>
+
+    <section id="form" class="form-shell" aria-labelledby="formTitle">
+      <div class="form-head">
+        <h2 id="formTitle">アンケートフォーム</h2>
+        <p>回答はGoogleフォームで送信されます。</p>
+      </div>
+      <div class="form-frame">
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeARErjnPH8QTz21Q7cuRoaf14m6xI5aN90CZdjTRF5930tOg/viewform?embedded=true" width="640" height="1829" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
+      </div>
+    </section>
+
+    <footer>
+      <p>陽一パペットランドへの感想を静かに集めるためのページです。</p>
+    </footer>
+  </main>
+</body>
+</html>
