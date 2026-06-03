@@ -15,6 +15,7 @@
       --accent: #2d7a58;
       --accent-ink: #f7fff9;
       --shadow: rgba(43, 32, 22, 0.12);
+      --tape: #b84438;
     }
 
     * {
@@ -26,6 +27,8 @@
       min-height: 100vh;
       overflow-x: hidden;
       background:
+        linear-gradient(90deg, rgba(23, 19, 15, 0.045) 1px, transparent 1px) 0 0 / 96px 100%,
+        linear-gradient(180deg, rgba(23, 19, 15, 0.035) 1px, transparent 1px) 0 0 / 100% 118px,
         linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0)),
         var(--bg);
       color: var(--ink);
@@ -51,6 +54,8 @@
     }
 
     .page {
+      position: relative;
+      z-index: 3;
       width: min(100% - 32px, 1120px);
       margin: 0 auto;
       padding: clamp(28px, 6vw, 72px) 0;
@@ -72,6 +77,7 @@
     }
 
     .label {
+      position: relative;
       margin: 0;
       width: fit-content;
       border: 1px solid var(--line);
@@ -81,6 +87,18 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1;
+    }
+
+    .label::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      bottom: -8px;
+      width: 32px;
+      height: 9px;
+      background: color-mix(in srgb, var(--tape), transparent 8%);
+      transform: rotate(-4deg);
+      opacity: 0.82;
     }
 
     .label,
@@ -166,7 +184,9 @@
       background: var(--paper);
       box-shadow: 0 20px 54px var(--shadow);
       transform-origin: 50% 80%;
-      animation: entrance-cover 980ms cubic-bezier(0.2, 0.82, 0.22, 1) 520ms both;
+      animation:
+        entrance-cover 980ms cubic-bezier(0.2, 0.82, 0.22, 1) 520ms both,
+        cover-breathe 6.8s ease-in-out 1.8s infinite;
     }
 
     .form-shell {
@@ -199,11 +219,35 @@
     }
 
     .form-frame {
+      position: relative;
       overflow: hidden;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--paper);
       box-shadow: 0 18px 54px var(--shadow);
+    }
+
+    .form-frame::before,
+    .form-frame::after {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      top: 16px;
+      width: 58px;
+      height: 14px;
+      background: color-mix(in srgb, var(--tape), transparent 10%);
+      opacity: 0.86;
+      pointer-events: none;
+    }
+
+    .form-frame::before {
+      left: 18px;
+      transform: rotate(-7deg);
+    }
+
+    .form-frame::after {
+      right: 18px;
+      transform: rotate(6deg);
     }
 
     .form-frame iframe {
@@ -219,6 +263,72 @@
       font-size: 13px;
       line-height: 1.7;
       animation-delay: 940ms;
+    }
+
+    .edge-stage {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .edge-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: min(42vh, 360px);
+      background:
+        linear-gradient(90deg, transparent 9%, rgba(23, 19, 15, 0.22) 9% 9.12%, transparent 9.12%),
+        linear-gradient(90deg, transparent 37%, rgba(23, 19, 15, 0.16) 37% 37.08%, transparent 37.08%),
+        linear-gradient(90deg, transparent 68%, rgba(23, 19, 15, 0.18) 68% 68.1%, transparent 68.1%),
+        linear-gradient(90deg, transparent 91%, rgba(23, 19, 15, 0.2) 91% 91.12%, transparent 91.12%);
+      opacity: 0.28;
+      animation: string-drift 7s ease-in-out infinite;
+    }
+
+    .edge-puppet {
+      position: absolute;
+      display: block;
+      width: var(--sprite-width);
+      height: auto;
+      user-select: none;
+      filter: drop-shadow(0 18px 20px rgba(43, 32, 22, 0.16));
+      opacity: 0;
+      animation:
+        entrance-rise 780ms cubic-bezier(0.2, 0.82, 0.22, 1) var(--sprite-delay) both,
+        var(--sprite-motion) var(--sprite-speed) ease-in-out calc(var(--sprite-delay) + 780ms) infinite;
+    }
+
+    .edge-puppet-peek {
+      --sprite-width: clamp(118px, 14vw, 190px);
+      --sprite-delay: 920ms;
+      --sprite-motion: puppet-peek;
+      --sprite-speed: 8.4s;
+      right: max(-42px, -3vw);
+      top: clamp(108px, 18vh, 190px);
+      transform-origin: 88% 54%;
+    }
+
+    .edge-puppet-round {
+      --sprite-width: clamp(84px, 11vw, 146px);
+      --sprite-delay: 1.08s;
+      --sprite-motion: puppet-bob;
+      --sprite-speed: 6.8s;
+      left: max(-30px, -2vw);
+      bottom: clamp(34px, 8vh, 92px);
+      transform-origin: 42% 90%;
+    }
+
+    .edge-puppet-sign {
+      --sprite-width: clamp(116px, 13vw, 176px);
+      --sprite-delay: 1.18s;
+      --sprite-motion: sign-sway;
+      --sprite-speed: 5.9s;
+      left: clamp(14px, 4vw, 54px);
+      top: clamp(270px, 47vh, 450px);
+      transform-origin: 48% 4%;
+      opacity: 0.9;
     }
 
     @keyframes entrance-curtain {
@@ -261,6 +371,65 @@
       }
     }
 
+    @keyframes cover-breathe {
+      0%,
+      100% {
+        transform: translateY(0) rotate(0) scale(1);
+      }
+
+      50% {
+        transform: translateY(-4px) rotate(0.6deg) scale(1.01);
+      }
+    }
+
+    @keyframes puppet-peek {
+      0%,
+      100% {
+        transform: translateX(0) rotate(-1deg);
+      }
+
+      45% {
+        transform: translateX(-16px) rotate(1.4deg);
+      }
+
+      62% {
+        transform: translateX(-10px) rotate(-0.8deg);
+      }
+    }
+
+    @keyframes puppet-bob {
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-12px) rotate(-2.8deg);
+      }
+    }
+
+    @keyframes sign-sway {
+      0%,
+      100% {
+        transform: rotate(-2deg);
+      }
+
+      50% {
+        transform: rotate(2.6deg) translateY(4px);
+      }
+    }
+
+    @keyframes string-drift {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      50% {
+        transform: translateX(6px);
+      }
+    }
+
     @media (max-width: 760px) {
       .page {
         width: min(100% - 24px, 1120px);
@@ -282,6 +451,17 @@
       .form-head p {
         text-align: left;
       }
+
+      .edge-puppet-sign,
+      .edge-puppet-round {
+        display: none;
+      }
+
+      .edge-puppet-peek {
+        --sprite-width: 116px;
+        top: 80px;
+        right: -52px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -297,6 +477,11 @@
   </style>
 </head>
 <body>
+  <div class="edge-stage" aria-hidden="true">
+    <img class="edge-puppet edge-puppet-peek" src="assets/characters/puppet-peek.png" alt="">
+    <img class="edge-puppet edge-puppet-round" src="assets/characters/puppet-round.png" alt="">
+    <img class="edge-puppet edge-puppet-sign" src="assets/characters/puppet-sign.png" alt="">
+  </div>
   <main class="page">
     <section class="intro" aria-labelledby="pageTitle">
       <div class="copy">
