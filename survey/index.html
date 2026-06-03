@@ -16,6 +16,7 @@
       --accent-ink: #f7fff9;
       --shadow: rgba(43, 32, 22, 0.12);
       --tape: #b84438;
+      --scroll-shift: 0px;
     }
 
     * {
@@ -33,6 +34,7 @@
         var(--bg);
       color: var(--ink);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      cursor: crosshair;
     }
 
     body::before {
@@ -146,6 +148,8 @@
     .button {
       min-height: 48px;
       display: inline-grid;
+      grid-auto-flow: column;
+      gap: 0;
       place-items: center;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -156,7 +160,8 @@
       transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
     }
 
-    .button:hover {
+    .button:hover,
+    .button:focus-visible {
       transform: translateY(-2px);
       box-shadow: 0 10px 24px var(--shadow);
     }
@@ -167,11 +172,46 @@
       color: var(--accent-ink);
     }
 
+    .button.primary::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      margin-left: 10px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0.86;
+      box-shadow: 9px 0 0 currentColor, 18px 0 0 currentColor;
+      animation: button-dots 1.3s steps(2, end) infinite;
+    }
+
     .cover {
+      position: relative;
       margin: 0;
       justify-self: end;
       width: min(100%, 280px);
       animation-delay: 520ms;
+    }
+
+    .cover::before,
+    .cover::after {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      top: -10px;
+      width: 48px;
+      height: 13px;
+      background: color-mix(in srgb, var(--tape), transparent 8%);
+      opacity: 0.88;
+    }
+
+    .cover::before {
+      left: -12px;
+      transform: rotate(-9deg);
+    }
+
+    .cover::after {
+      right: -12px;
+      transform: rotate(8deg);
     }
 
     .cover img {
@@ -190,9 +230,27 @@
     }
 
     .form-shell {
+      position: relative;
       display: grid;
       gap: 16px;
       animation-delay: 820ms;
+    }
+
+    .form-shell::before {
+      content: "";
+      position: absolute;
+      right: clamp(10px, 6vw, 80px);
+      top: -92px;
+      width: clamp(84px, 12vw, 148px);
+      aspect-ratio: 1;
+      background: url("assets/characters/puppet-charms.png") center / contain no-repeat;
+      pointer-events: none;
+      filter: drop-shadow(0 14px 18px rgba(43, 32, 22, 0.12));
+      opacity: 0;
+      transform-origin: 50% 0;
+      animation:
+        entrance-rise 780ms cubic-bezier(0.2, 0.82, 0.22, 1) 1.24s both,
+        sign-sway 5.4s ease-in-out 2s infinite;
     }
 
     .form-head {
@@ -287,6 +345,22 @@
       animation: string-drift 7s ease-in-out infinite;
     }
 
+    .edge-stage::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -60px;
+      width: clamp(160px, 20vw, 260px);
+      aspect-ratio: 1;
+      background: url("assets/characters/puppet-door.png") center / contain no-repeat;
+      opacity: 0;
+      filter: drop-shadow(0 20px 28px rgba(43, 32, 22, 0.15));
+      transform: translateX(-50%) translateY(22px) rotate(-1deg);
+      animation:
+        door-enter 900ms cubic-bezier(0.2, 0.82, 0.22, 1) 1.42s both,
+        door-knock 7.6s ease-in-out 2.4s infinite;
+    }
+
     .edge-puppet {
       position: absolute;
       display: block;
@@ -306,7 +380,7 @@
       --sprite-motion: puppet-peek;
       --sprite-speed: 8.4s;
       right: max(-42px, -3vw);
-      top: clamp(108px, 18vh, 190px);
+      top: calc(clamp(108px, 18vh, 190px) + var(--scroll-shift));
       transform-origin: 88% 54%;
     }
 
@@ -329,6 +403,28 @@
       top: clamp(270px, 47vh, 450px);
       transform-origin: 48% 4%;
       opacity: 0.9;
+    }
+
+    .sparkle-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 8;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .paper-bit {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: var(--size);
+      height: calc(var(--size) * 0.58);
+      border: 1px solid rgba(23, 19, 15, 0.18);
+      border-radius: 2px;
+      background: var(--bit-color);
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(var(--rot));
+      animation: paper-pop 840ms cubic-bezier(0.2, 0.82, 0.22, 1) forwards;
     }
 
     @keyframes entrance-curtain {
@@ -430,6 +526,60 @@
       }
     }
 
+    @keyframes button-dots {
+      0%,
+      100% {
+        opacity: 0.32;
+      }
+
+      50% {
+        opacity: 0.9;
+      }
+    }
+
+    @keyframes door-enter {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(40px) rotate(-4deg);
+      }
+
+      to {
+        opacity: 0.9;
+        transform: translateX(-50%) translateY(0) rotate(-1deg);
+      }
+    }
+
+    @keyframes door-knock {
+      0%,
+      100% {
+        transform: translateX(-50%) translateY(0) rotate(-1deg);
+      }
+
+      48% {
+        transform: translateX(-50%) translateY(-5px) rotate(1.4deg);
+      }
+
+      52% {
+        transform: translateX(-50%) translateY(-3px) rotate(-2deg);
+      }
+    }
+
+    @keyframes paper-pop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.4) rotate(var(--rot));
+      }
+
+      18% {
+        opacity: 0.95;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(calc(var(--rot) + 150deg));
+      }
+    }
+
     @media (max-width: 760px) {
       .page {
         width: min(100% - 24px, 1120px);
@@ -453,14 +603,22 @@
       }
 
       .edge-puppet-sign,
-      .edge-puppet-round {
+      .edge-puppet-round,
+      .form-shell::before {
         display: none;
       }
 
       .edge-puppet-peek {
-        --sprite-width: 116px;
-        top: 80px;
-        right: -52px;
+        --sprite-width: 104px;
+        top: 104px;
+        right: -76px;
+      }
+
+      .edge-stage::after {
+        width: 132px;
+        left: auto;
+        right: -34px;
+        bottom: 18px;
       }
     }
 
@@ -473,10 +631,17 @@
         scroll-behavior: auto !important;
         transition-duration: 1ms !important;
       }
+
+      .sparkle-layer,
+      .edge-stage::after,
+      .form-shell::before {
+        display: none !important;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="sparkle-layer" aria-hidden="true"></div>
   <div class="edge-stage" aria-hidden="true">
     <img class="edge-puppet edge-puppet-peek" src="assets/characters/puppet-peek.png" alt="">
     <img class="edge-puppet edge-puppet-round" src="assets/characters/puppet-round.png" alt="">
@@ -512,5 +677,46 @@
       <p>陽一パペットランドへの感想を静かに集めるためのページです。</p>
     </footer>
   </main>
+  <script>
+    const root = document.documentElement;
+    const sparkleLayer = document.querySelector(".sparkle-layer");
+    const bitColors = ["#fffdf8", "#b84438", "#2d7a58", "#17130f", "#ded6ca"];
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function updateScrollShift() {
+      const shift = Math.sin(window.scrollY / 180) * 12;
+      root.style.setProperty("--scroll-shift", `${shift.toFixed(2)}px`);
+    }
+
+    function scatterPaper(x, y, amount = 8) {
+      if (reducedMotion || !sparkleLayer) return;
+
+      for (let i = 0; i < amount; i += 1) {
+        const bit = document.createElement("span");
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 24 + Math.random() * 58;
+        bit.className = "paper-bit";
+        bit.style.setProperty("--x", `${x}px`);
+        bit.style.setProperty("--y", `${y}px`);
+        bit.style.setProperty("--dx", `${Math.cos(angle) * distance}px`);
+        bit.style.setProperty("--dy", `${Math.sin(angle) * distance - 12}px`);
+        bit.style.setProperty("--rot", `${Math.random() * 180 - 90}deg`);
+        bit.style.setProperty("--size", `${7 + Math.random() * 10}px`);
+        bit.style.setProperty("--bit-color", bitColors[Math.floor(Math.random() * bitColors.length)]);
+        sparkleLayer.append(bit);
+        bit.addEventListener("animationend", () => bit.remove(), { once: true });
+      }
+    }
+
+    window.addEventListener("scroll", updateScrollShift, { passive: true });
+    window.addEventListener("pointerdown", (event) => scatterPaper(event.clientX, event.clientY));
+    document.querySelectorAll(".button, .cover").forEach((target) => {
+      target.addEventListener("pointerenter", (event) => {
+        const rect = target.getBoundingClientRect();
+        scatterPaper(rect.left + rect.width / 2, rect.top + rect.height / 2, 5);
+      });
+    });
+    updateScrollShift();
+  </script>
 </body>
 </html>
